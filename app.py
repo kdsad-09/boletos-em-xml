@@ -78,12 +78,36 @@ if uploaded_file is not None:
         st.dataframe(df, use_container_width=True)
         
         # Opção para baixar em CSV
-        csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="Baixar Tabela em CSV",
+     import io
+
+if uploaded_file is not None:
+    df = processar_xmls_zip(uploaded_file)
+    
+    if not df.empty:
+        st.subheader("Resultados Encontrados")
+        st.dataframe(df, use_container_width=True)
+        
+        col1, col2 = st.columns(2)
+        
+        # Opção 1: CSV formatado para o Excel do Brasil (separado por ponto e vírgula)
+        csv = df.to_csv(index=False, sep=';', encoding='utf-8-sig')
+        col1.download_button(
+            label="Baixar CSV (Separado por Células)",
             data=csv,
             file_name="parcelas_nfe.csv",
             mime="text/csv"
+        )
+        
+        # Opção 2: Download direto em Excel (.xlsx)
+        buffer = io.BytesIO()
+        with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Parcelas')
+            
+        col2.download_button(
+            label="Baixar Planilha Excel (.xlsx)",
+            data=buffer.getvalue(),
+            file_name="parcelas_nfe.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
     else:
         st.error("Nenhum arquivo XML válido foi encontrado dentro do arquivo ZIP enviado.")
