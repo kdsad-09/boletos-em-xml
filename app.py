@@ -78,7 +78,7 @@ if uploaded_file is not None:
         st.dataframe(df, use_container_width=True)
         
         # Opção para baixar em CSV
-     import io
+import io
 
 if uploaded_file is not None:
     df = processar_xmls_zip(uploaded_file)
